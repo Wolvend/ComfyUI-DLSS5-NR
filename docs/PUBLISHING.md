@@ -25,18 +25,18 @@ Before the first release, ensure the CI job is green.
 Update versions if needed, commit, then tag:
 
 ```bash
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.3.1-fix1
+git push origin v0.3.1-fix1
 ```
 
 `.github/workflows/release.yml` will build on `windows-latest` and create:
 
 ```text
-ComfyUI-DLSS5-NR-v0.3.0-windows-x64.zip
-ComfyUI-DLSS5-NR-v0.3.0-windows-x64.zip.sha256
+ComfyUI-DLSS5-NR-v0.3.1-fix1-windows-x64.zip
+ComfyUI-DLSS5-NR-v0.3.1-fix1-windows-x64.zip.sha256
 ```
 
-The ZIP contains the project-owned prebuilt native bridge and caller helper, so end users do not need Visual Studio. Versions containing a hyphen (for example `0.3.1-alpha1`) are automatically published as GitHub prereleases; `v0.3.0` is published as a normal release.
+The ZIP contains the project-owned prebuilt native bridge and caller helper, so end users do not need Visual Studio. Versions containing a hyphen (including `0.3.1-fix1`) are automatically published as GitHub prereleases. After compatibility testing, a tag such as `v0.3.1` can be published as the next normal release.
 
 ## 4. What must never be in the release
 

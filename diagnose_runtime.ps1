@@ -23,7 +23,20 @@ function Show-Dll([string]$label, [string]$path) {
     } catch {}
 }
 
-Write-Host '[DLSS5-NR] Runtime diagnostics v0.3.0'
+Write-Host '[DLSS5-NR] Runtime diagnostics v0.3.1-fix1'
+try {
+    Write-Host ""
+    Write-Host '[NVIDIA display adapters]'
+    Get-CimInstance Win32_VideoController -ErrorAction Stop |
+        Where-Object { $_.Name -match 'NVIDIA' } |
+        ForEach-Object {
+            Write-Host "  $($_.Name)"
+            Write-Host "  DriverVersion: $($_.DriverVersion)"
+            Write-Host "  PNPDeviceID: $($_.PNPDeviceID)"
+        }
+} catch {
+    Write-Host "  Could not query Win32_VideoController: $($_.Exception.Message)" -ForegroundColor Yellow
+}
 Show-Dll 'NGX core local override (optional)' $core
 Show-Dll 'DLSS NR user-supplied runtime' $nr
 if (Test-Path $shimNew) { Show-Dll 'Project caller helper' $shimNew } else { Show-Dll 'Project caller helper (legacy)' $shimOld }

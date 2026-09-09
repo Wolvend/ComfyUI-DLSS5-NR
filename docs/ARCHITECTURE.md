@@ -109,7 +109,7 @@ The motion estimator receives **raw ComfyUI input frames**, not Neural Rendering
 
 ## NVOFA transport
 
-The Neural Rendering path is D3D12, but v0.3.0 uses the NVOF **D3D11** driver entry point on a private D3D11 device created from the same `IDXGIAdapter1`.
+The Neural Rendering path is D3D12, while v0.3.1-fix1 uses the NVOF **D3D11** driver entry point on a private D3D11 device created from the same `IDXGIAdapter1`.
 
 Reasons:
 
@@ -118,18 +118,20 @@ Reasons:
 - the D3D11 function-table behavior and flow direction have existing field validation;
 - the current ComfyUI bridge already stages frames through CPU, so a small D3D11 flow readback does not introduce a new class of GPU-sharing synchronization yet.
 
-Fixed v0.3.0 settings:
+v0.3.1-fix1 compatibility contract:
 
 ```text
 NVOF API layout: 0x20
 mode: optical flow
-grid: 2x2
+grid: capability-probed (prefer 2, then 1/4 fallback)
 perf: FAST (20)
 external hints: disabled
 NVOFA temporal hints: disabled
-input: B8G8R8A8_UNORM luma
-output: R16G16_SINT
+input: driver-probed D3D11 format; prefer R8 luma, then BGRA8/RGBA8
+output: driver-probed R16G16_SINT
 ```
+
+The bridge queries `NvOFGetCaps` before `NvOFInit`, then queries the D3D11 surface formats after initialization as part of buffer allocation. This follows NVIDIA's documented D3D11 flow and avoids assuming that all GPU/driver generations expose the same resource formats. NVOF-only textures prefer `BindFlags = 0` because the bridge accesses them through registered NVOF resource handles; earlier SRV/UAV bindings remain fallbacks.
 
 NVOF vectors use signed S10.5 storage: one integer unit is 1/32 pixel. For a cell `(fx,fy)`:
 

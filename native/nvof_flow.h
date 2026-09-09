@@ -36,7 +36,8 @@ bool NvofPrepareFrame(
     NvofFlowFrame& out,
     std::string& error);
 
-// Releases the active OFA session and its D3D11 textures, but keeps no contract state.
+// Releases the active OFA session and its D3D11 textures while preserving the
+// latest diagnostic snapshot for Runtime Info / issue reports.
 void NvofReleaseSession();
 
 // Full teardown including nvofapi64.dll.
@@ -45,6 +46,11 @@ void NvofShutdown();
 // Lightweight driver check used by Runtime Info. Does not create an OFA session.
 bool NvofDriverApiAvailable();
 
-// Fixed settings used by this release.
+// Selected settings. Grid may change after capability probing (preferred = 2).
 uint32_t NvofGridSize();
 uint32_t NvofPerfLevel();
+
+// Human-readable diagnostic snapshot from the latest NVOF probe/session.
+// Includes driver API version, capability-probed grid, supported D3D11 formats,
+// selected formats, resolution, and the most recent NVOF failure when available.
+const char* NvofDiagnostics();
