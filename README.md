@@ -18,7 +18,7 @@ ComfyUI IMAGE
     -> ComfyUI IMAGE
 ```
 
-Current v0.3.1-fix1 still uses CPU staging for the ComfyUI tensor transfer:
+Current v0.3.1 still uses CPU staging for the ComfyUI tensor transfer:
 
 ```text
 Torch IMAGE -> CPU float32 -> D3D12 RGBA16F -> DLSS NR -> CPU float32 -> Torch IMAGE
@@ -30,7 +30,7 @@ ComfyUI receives **frame-by-frame progress updates** while an IMAGE batch is pro
 
 ## Temporal mode: NVIDIA Optical Flow
 
-v0.3.1-fix1 uses an explicit motion-vector temporal path and adds per-frame motion estimation through the **NVIDIA Optical Flow Accelerator (NVOFA)**.
+v0.3.1 uses an explicit motion-vector temporal path and adds per-frame motion estimation through the **NVIDIA Optical Flow Accelerator (NVOFA)**.
 
 Only two batch modes remain:
 
@@ -54,7 +54,7 @@ current raw frame -----/                                      |
                                                               + DLSS temporal history
 ```
 
-Implementation details in v0.3.1-fix1:
+Implementation details in v0.3.1:
 
 - private D3D11 device on the same NVIDIA DXGI adapter used by the D3D12/NGX bridge;
 - driver-provided `nvofapi64.dll` (no separate model/download);
@@ -66,13 +66,13 @@ Implementation details in v0.3.1-fix1:
 - conversion to full-resolution `R16G16_FLOAT` using nearest-cell reconstruction;
 - the DLSSNR MV texture stores normalized UV motion and uses `MVecScale=(width,height)`;
 - NVOFA is called with current frame as input and previous frame as reference, producing the current-to-previous reprojection direction used by the temporal contract;
-- NVOFA temporal hints remain disabled in v0.3.1-fix1 so each frame pair is deterministic and a new ComfyUI batch can reset cleanly.
+- NVOFA temporal hints remain disabled in v0.3.1 so each frame pair is deterministic and a new ComfyUI batch can reset cleanly.
 
 The first frame has no previous frame, so temporal mode bootstraps it with an explicit zero-MV field.
 
-### NVOF compatibility probing (v0.3.1-fix1)
+### NVOF compatibility probing (v0.3.1)
 
-v0.3.0 hard-coded a BGRA8 D3D11 input surface and a 2x2 output grid. v0.3.1-fix1 queries `NvOFGetCaps` before `NvOFInit`, then queries `NvOFGetSurfaceFormatCountD3D11` / `NvOFGetSurfaceFormatD3D11` during buffer allocation after initialization, matching NVIDIA's documented D3D11 flow. It prefers native `R8_UNORM` luma when advertised and creates NVOF resources without unnecessary SRV/UAV bindings where possible. If optional queries are unavailable on an older driver, the bridge falls back to the v0.3.0 assumptions rather than breaking a previously working setup.
+v0.3.0 hard-coded a BGRA8 D3D11 input surface and a 2x2 output grid. v0.3.1 queries `NvOFGetCaps` before `NvOFInit`, then queries `NvOFGetSurfaceFormatCountD3D11` / `NvOFGetSurfaceFormatD3D11` during buffer allocation after initialization, matching NVIDIA's documented D3D11 flow. It prefers native `R8_UNORM` luma when advertised and creates NVOF resources without unnecessary SRV/UAV bindings where possible. If optional queries are unavailable on an older driver, the bridge falls back to the v0.3.0 assumptions rather than breaking a previously working setup.
 
 ## Requirements
 
@@ -228,9 +228,9 @@ Do not download `nvofapi64.dll` from third-party DLL sites.
 
 ### `NVIDIA Optical Flow: nvOFInit / nvOFExecute failed`
 
-Attach the complete ComfyUI exception and `DLSS 5 NR Runtime Info` output to an issue. v0.3.1-fix1 reports the driver-advertised D3D11 input/output formats, selected BindFlags, supported output grids, selected format/grid, NVOF maximum API version, session resolution, raw status code, and the driver's own last-error text when available.
+Attach the complete ComfyUI exception and `DLSS 5 NR Runtime Info` output to an issue. v0.3.1 reports the driver-advertised D3D11 input/output formats, selected BindFlags, supported output grids, selected format/grid, NVOF maximum API version, session resolution, raw status code, and the driver's own last-error text when available.
 
-This prerelease specifically targets failures where frame 0 (zero MV) succeeds but frame 1 fails on the first real `NvOFExecute`.
+v0.3.1 fixes a confirmed compatibility failure where frame 0 (zero MV) succeeds but frame 1 fails on the first real `NvOFExecute`. The fix was validated both on a locally reproducible failing input and by the reporter of issue #5.
 
 ### `CreateFeature(18) failed: 0xBAD00001`
 
@@ -246,7 +246,7 @@ Try `channel_order = RGBA` or `BGRA`. `auto` compares both interpretations again
 
 ### Old workflow says `batch_mode` is invalid
 
-v0.3.1-fix1 uses only `still images` and `temporal`; the older `temporal sequence` / `temporal sequence (legacy no MV)` values are no longer valid. Delete and re-add the node, or change the saved widget to one of the two current values:
+v0.3.1 uses only `still images` and `temporal`; the older `temporal sequence` / `temporal sequence (legacy no MV)` values are no longer valid. Delete and re-add the node, or change the saved widget to one of the two current values:
 
 ```text
 still images
@@ -296,4 +296,4 @@ The integration uses undocumented/pre-release Neural Rendering behavior, includi
 
 ## Status
 
-v0.3.1-fix1 is a prerelease compatibility build based on v0.3.0. It adds NVOF capability/surface-format probing and improved diagnostics for driver/GPU combinations that fail on the first real optical-flow execute. The integration remains unofficial and experimental with respect to the NVIDIA Neural Rendering interface.
+v0.3.1 is the stable maintenance release following v0.3.0. It adds NVOF capability/surface-format probing and improved diagnostics for driver/GPU/input combinations that can fail on the first real optical-flow execute. The compatibility fix was validated on multiple systems, including the configuration reported in issue #5. The integration remains unofficial and experimental with respect to the NVIDIA Neural Rendering interface.

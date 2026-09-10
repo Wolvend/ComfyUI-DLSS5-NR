@@ -109,7 +109,7 @@ The motion estimator receives **raw ComfyUI input frames**, not Neural Rendering
 
 ## NVOFA transport
 
-The Neural Rendering path is D3D12, while v0.3.1-fix1 uses the NVOF **D3D11** driver entry point on a private D3D11 device created from the same `IDXGIAdapter1`.
+The Neural Rendering path is D3D12, while v0.3.1 uses the NVOF **D3D11** driver entry point on a private D3D11 device created from the same `IDXGIAdapter1`.
 
 Reasons:
 
@@ -118,7 +118,7 @@ Reasons:
 - the D3D11 function-table behavior and flow direction have existing field validation;
 - the current ComfyUI bridge already stages frames through CPU, so a small D3D11 flow readback does not introduce a new class of GPU-sharing synchronization yet.
 
-v0.3.1-fix1 compatibility contract:
+v0.3.1 compatibility contract:
 
 ```text
 NVOF API layout: 0x20

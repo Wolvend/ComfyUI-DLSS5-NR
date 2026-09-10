@@ -3,7 +3,7 @@
 //
 // NVIDIA Optical Flow D3D11 integration.
 //
-// v0.3.1-fix1 removes the v0.3.0 assumption that every driver/GPU accepts a
+// v0.3.1 removes the v0.3.0 assumption that every driver/GPU accepts a
 // hard-coded BGRA8 input surface. NVIDIA's public NVOF programming guide asks
 // D3D11 clients to query capabilities before initialization and supported
 // surface formats during buffer allocation. This implementation follows that sequence
@@ -823,7 +823,7 @@ bool NvofPrepareFrame(
     in.inputFrame = g_ofa.reg_src[g_ofa.current];          // current
     in.referenceFrame = g_ofa.reg_src[g_ofa.current ^ 1]; // previous
     in.externalHints = nullptr;
-    // v0.3.1-fix1 intentionally keeps the v0.3.0 pairwise behavior. NVOF's own
+    // v0.3.1 intentionally keeps the v0.3.0 pairwise behavior. NVOF's own
     // temporal hints can be evaluated separately after the compatibility fix.
     in.disableTemporalHints = 1;
     exec_out.outputBuffer = g_ofa.reg_flow;

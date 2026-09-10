@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1 - 2026-09-10
+
+- Promoted the tested `0.3.1-fix1` NVIDIA Optical Flow compatibility work to a stable maintenance release.
+- Fixed confirmed first-`NvOFExecute` failures affecting some input videos / GPU-driver combinations.
+- NVOF now probes supported output grids and D3D11 surface formats instead of relying solely on the v0.3.0 hard-coded assumptions.
+- Prefers driver-advertised `R8_UNORM` luma input with compatible BGRA8/RGBA8 fallbacks.
+- Verifies `R16G16_SINT` optical-flow output support and uses compatibility-oriented D3D11 resource bindings.
+- Corrected NVOF status decoding and expanded Runtime Info with selected formats, grids, API version, resolution, BindFlags and driver error details.
+- Temporal behavior is otherwise unchanged: frame 0 uses zero MV; later frames use current-to-previous NVOF with FAST preset and NVOF temporal hints disabled.
+- The fix was validated against a locally reproducible failing input and confirmed by the reporter of issue #5.
+
 ## 0.3.1-fix1 - 2026-09-09
 
 - Added NVIDIA Optical Flow D3D11 capability and surface-format probing for compatibility across GPU/driver generations.

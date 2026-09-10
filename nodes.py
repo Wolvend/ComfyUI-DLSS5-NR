@@ -21,7 +21,7 @@ _lib = None
 _initialized_gpu = None
 _dll_directory_handles = []
 
-__version__ = "0.3.1-fix1"
+__version__ = "0.3.1"
 
 
 class DLSS5NRError(RuntimeError):
@@ -198,7 +198,7 @@ class DLSS5NeuralRendering:
         style_i = _style_to_int(style)
         is_sequence = batch_mode == "temporal"
 
-        # v0.3.1-fix1 still uses CPU staging. Temporal motion estimation itself
+        # v0.3.1 still uses CPU staging. Temporal motion estimation itself
         # runs through NVIDIA's hardware Optical Flow engine on a private D3D11 device.
         # simple and robust while still remaining fully in-process.
         src = image[..., :3].detach().to(device="cpu", dtype=torch.float32).contiguous().numpy()

@@ -23,7 +23,7 @@ function Show-Dll([string]$label, [string]$path) {
     } catch {}
 }
 
-Write-Host '[DLSS5-NR] Runtime diagnostics v0.3.1-fix1'
+Write-Host '[DLSS5-NR] Runtime diagnostics v0.3.1'
 try {
     Write-Host ""
     Write-Host '[NVIDIA display adapters]'

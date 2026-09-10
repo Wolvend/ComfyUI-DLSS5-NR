@@ -648,7 +648,7 @@ static bool InitNGXSession() {
     bool core_ok = false;
     if (g_core_init_project) {
         for (int ver = 0x13; ver <= 0x20 && !core_ok; ++ver) {
-            NGXResult r = g_core_init_project(PROJECT_ID, 0, "0.3.1-fix1", g_runtime_dir.c_str(), g_device.Get(), ver, nullptr);
+            NGXResult r = g_core_init_project(PROJECT_ID, 0, "0.3.1", g_runtime_dir.c_str(), g_device.Get(), ver, nullptr);
             core_ok = (r == NGX_SUCCESS);
         }
     }
@@ -711,7 +711,7 @@ static void ShutdownUnlocked() {
 extern "C" {
 
 __declspec(dllexport) const char* __cdecl dlss5nr_version() {
-    return "0.3.1-fix1-cpu-staging-nvof-probe";
+    return "0.3.1-cpu-staging-nvof";
 }
 
 __declspec(dllexport) const char* __cdecl dlss5nr_gpu_name() {
