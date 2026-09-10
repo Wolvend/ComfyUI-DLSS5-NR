@@ -21,7 +21,7 @@ _lib = None
 _initialized_gpu = None
 _dll_directory_handles = []
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 class DLSS5NRError(RuntimeError):
@@ -99,6 +99,8 @@ def _load_library():
     lib.dlss5nr_nvof_grid.restype = ctypes.c_int
     lib.dlss5nr_nvof_perf.argtypes = []
     lib.dlss5nr_nvof_perf.restype = ctypes.c_int
+    lib.dlss5nr_nvof_info.argtypes = []
+    lib.dlss5nr_nvof_info.restype = ctypes.c_char_p
 
     _lib = lib
     return lib
@@ -196,7 +198,7 @@ class DLSS5NeuralRendering:
         style_i = _style_to_int(style)
         is_sequence = batch_mode == "temporal"
 
-        # v0.3.0 still uses CPU staging. Temporal motion estimation itself
+        # v0.3.1 still uses CPU staging. Temporal motion estimation itself
         # runs through NVIDIA's hardware Optical Flow engine on a private D3D11 device.
         # simple and robust while still remaining fully in-process.
         src = image[..., :3].detach().to(device="cpu", dtype=torch.float32).contiguous().numpy()
@@ -293,6 +295,8 @@ class DLSS5NRRuntimeInfo:
             nvof_available = bool(lib.dlss5nr_nvof_available())
             nvof_grid = int(lib.dlss5nr_nvof_grid())
             nvof_perf = int(lib.dlss5nr_nvof_perf())
+            nvof_info = lib.dlss5nr_nvof_info()
+            nvof_info_s = nvof_info.decode("utf-8", errors="replace") if nvof_info else "<no NVOF diagnostics>"
 
         nr_dll = _RUNTIME / "nvngx_dlssnr.dll"
         nr_info = "missing"
@@ -307,6 +311,7 @@ class DLSS5NRRuntimeInfo:
             f"GPU index: {gpu_index}\n"
             f"NVIDIA Optical Flow API: {'available' if nvof_available else 'NOT FOUND'}\n"
             f"Temporal motion: NVOFA grid {nvof_grid}, perf {nvof_perf} (FAST); first frame = zero MV\n"
+            f"--- NVOF diagnostics ---\n{nvof_info_s.rstrip()}\n"
             f"Runtime dir: {_RUNTIME}\n"
             f"nvngx_dlssnr.dll: {nr_info}",
         )
